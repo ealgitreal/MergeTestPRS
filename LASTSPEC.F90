@@ -14,9 +14,9 @@
       LOGICAL   NATLASTDEF,FSTRUG
       INTEGER   frictionLength_int
       CHARACTER frictionLength_char*6
-      INTEGER   FindFrictionLength
+      INTEGER   FindFrictionLength,InstallationNumber
 
-      INTEGER,EXTERNAL:: CB_BUT1,CB_BUT2,CB_BUT3,CB_BUT4,&
+      INTEGER,EXTERNAL:: CB_BUT1,CB_BUT2,CB_BUT3,CB_BUT4,CB_BUT5,&
                          CB_SNEV_DEF_WREP,CB_SNEV_DEF,CB_SNEV_LS_DEF,&
                          CB_SNEH_DEF_WREP,CB_SNEH_DEF,CB_SNEH_LS_DEF,&
                          CB_SNEG_DEF_WREP,CB_SNEG_DEF,CB_QSNE_DEP_DEF
@@ -33,7 +33,10 @@
       INCLUDE 'FID.INS'
       INCLUDE 'LOCAL.INS'
 
+      COMMON /SETTINGS/InstallationNumber
+
       W=8
+      Accelerate1=0
       SS_NLAST_SPEC=2
 
 !      IF (NORM=='EC'.AND.INAX==1) THEN
@@ -538,11 +541,23 @@
       CALL W_CENTRE
       CALL W_BUTTON(-1,1296,0,CB_BUT1,.FALSE.)   ! Reset all
       CALL W_BUTTON(-1,1297,0,CB_BUT2,.FALSE.)   ! Reset nature loads
-      CALL W_BUTTON(-1,1322,2,CB_BUT3,.FALSE.)   ! OK, &Plot
+      CALL W_BUTTON(-1,1322,0,CB_BUT3,.FALSE.)   ! OK, &Plot
 
+      IF(InstallationNumber==24) THEN
+        CALL W_BUTTON(-1,3201,2,CB_BUT5,.FALSE.)   ! OK>...>code check
+      ELSE
+        CALL W_NL(2)
+      ENDIF
+      
       CALL W_OK_CANCEL_BUTTON(368,CB_BUT4)
-
+      
       CALL W_WINDOW_END
+
+      IF (L_BUT_NO==5) THEN
+      Accelerate1=1
+      L_BUT_NO=4
+      ENDIF
+
       IF (W_REPEAT) GOTO 100
 
       IF (L_BUT_NO==0) THEN       ! Cancel
@@ -556,6 +571,7 @@
         NATLASTDEF=.TRUE.
         GOTO 5
       ENDIF
+      
 
 !     Data ok
 
