@@ -14,9 +14,9 @@
       LOGICAL   NATLASTDEF,FSTRUG
       INTEGER   frictionLength_int
       CHARACTER frictionLength_char*6
-      INTEGER   FindFrictionLength
+      INTEGER   FindFrictionLength,InstallationNumber
 
-      INTEGER,EXTERNAL:: CB_BUT1,CB_BUT2,CB_BUT3,CB_BUT4,&
+      INTEGER,EXTERNAL:: CB_BUT1,CB_BUT2,CB_BUT3,CB_BUT4,CB_BUT5,&
                          CB_SNEV_DEF_WREP,CB_SNEV_DEF,CB_SNEV_LS_DEF,&
                          CB_SNEH_DEF_WREP,CB_SNEH_DEF,CB_SNEH_LS_DEF,&
                          CB_SNEG_DEF_WREP,CB_SNEG_DEF,CB_QSNE_DEP_DEF
@@ -33,7 +33,10 @@
       INCLUDE 'FID.INS'
       INCLUDE 'LOCAL.INS'
 
+      COMMON /SETTINGS/InstallationNumber
+
       W=8
+      Accelerate1=0
       SS_NLAST_SPEC=2
 
 !      IF (NORM=='EC'.AND.INAX==1) THEN
@@ -538,11 +541,23 @@
       CALL W_CENTRE
       CALL W_BUTTON(-1,1296,0,CB_BUT1,.FALSE.)   ! Reset all
       CALL W_BUTTON(-1,1297,0,CB_BUT2,.FALSE.)   ! Reset nature loads
-      CALL W_BUTTON(-1,1322,2,CB_BUT3,.FALSE.)   ! OK, &Plot
+      CALL W_BUTTON(-1,1322,0,CB_BUT3,.FALSE.)   ! OK, &Plot
 
+      IF(InstallationNumber==24) THEN
+        CALL W_BUTTON(-1,3201,2,CB_BUT5,.FALSE.)   ! OK>...>code check
+      ELSE
+        CALL W_NL(2)
+      ENDIF
+      
       CALL W_OK_CANCEL_BUTTON(368,CB_BUT4)
-
+      
       CALL W_WINDOW_END
+
+      IF (L_BUT_NO==5) THEN
+      Accelerate1=1
+      L_BUT_NO=4
+      ENDIF
+
       IF (W_REPEAT) GOTO 100
 
       IF (L_BUT_NO==0) THEN       ! Cancel
@@ -556,6 +571,7 @@
         NATLASTDEF=.TRUE.
         GOTO 5
       ENDIF
+      
 
 !     Data ok
 
@@ -809,7 +825,7 @@
       IF (L_INT(N)==2.OR.L_INT(N)==3) THEN
         CALL W_WRTTX(1292,0,-1)                                      ! Adjoining roof inclination
         CALL W_WRTTXT(' as',0,-1)
-        CALL W_INPREA_CB(0,0,L_REA(N),0.D0,0.D0,0,W,'°',0,L_RB(N),0,CB_LS_FUNC)
+        CALL W_INPREA_CB(0,0,L_REA(N),0.D0,0.D0,0,W,' ',0,L_RB(N),0,CB_LS_FUNC)
         CALL W_BC(1)
       ENDIF
 !      IF (L_INT(N)==3.AND.NORM=='EC'.AND.INAX==1)&
@@ -1700,8 +1716,8 @@
       CALL W_INPREA(1302,0,L_REA(1),0.D0,0.D0,1,W,'kg/m3',-3,1,0)         ! MAS
 
       IF (L_INT(1)==1) THEN  ! SBI
-        CALL W_INPREA(1303,0,L_REA(2),0.D0,0.D0,1,W,'°',-3,1,0)           ! FIDEG
-        CALL W_INPREA(1304,0,L_REA(3),0.D0,0.D0,1,W,'°',-3,1,0)           ! DELTA
+        CALL W_INPREA(1303,0,L_REA(2),0.D0,0.D0,1,W,' ',-3,1,0)           ! FIDEG
+        CALL W_INPREA(1304,0,L_REA(3),0.D0,0.D0,1,W,' ',-3,1,0)           ! DELTA
       ELSE
         CALL W_INPREA(1305,0,L_REA(4),0.D0,0.D0,1,W,' ',-3,1,0)           ! LVKS
       ENDIF
@@ -1711,7 +1727,7 @@
       CALL W_HEADING(558,0,-1)                                            ! Right side
       CALL W_INPREA2(1307,0,L_REA(5),L_REA(6),0.D0,0.D0,1,W,' ',-3,1,0)   ! HQLV/H
       IF (L_INT(1)==1) THEN  ! SBI
-        CALL W_INPREA2(1308,0,L_REA(7),L_REA(8),0.D0,0.D0,1,W,'°',-3,1,0) ! BETAV/H
+        CALL W_INPREA2(1308,0,L_REA(7),L_REA(8),0.D0,0.D0,1,W,' ',-3,1,0) ! BETAV/H
       ENDIF
       CALL W_INPREA2(1309,0,L_REA(9),L_REA(10),0.D0,0.D0,1,W,' ',-3,1,0)  ! LVFAKV/H
 
